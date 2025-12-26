@@ -13,7 +13,7 @@
 /* Table of notes frequencies */
 /* 107 notes, first one is MIDI note #21 (A0), last one is #127 (G9) */
 
-const float_t notesFreq[] =
+const double notesFreq[] =
 {
 		27.50000000, 29.13523509, 30.86770633,
 		32.70319566, // C1 (#24)

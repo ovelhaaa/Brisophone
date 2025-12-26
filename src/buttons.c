@@ -3,7 +3,7 @@
  * File Name		: buttons.c
  * Date				:
  * Author			: Xavier Halgand
- * Description		:
+ * Description		: Ported to STM32H7 HAL with Polling/Debounce
  ******************************************************************************
  */
 
@@ -16,10 +16,17 @@ static const uint16_t	display[] = {1, 3, 7, 15, 31, 63, 127, 255, 511, 1023,
 							1022, 1020, 1016, 1008, 992, 960, 896, 768, 512 /* index 18 */,
 							513, 771, 903 };
 
+// Internal debounce state
+static uint8_t btn_state[4] = {0,0,0,0};
+// Mapping: Btn1=PD8, Btn2=PD9, Btn3=PD10, Btn4=PD11
+
+// Helper to emulate LED behavior (optional or remove)
+// #define STM_EVAL_LEDOn(x)
+// #define STM_EVAL_LEDOff(x)
+
 //---------------------------------------------------------------------------
 void action_ButtonPressed1(void) // change parameter to edit (forward)
 {
-	STM_EVAL_LEDOn(LED_Blue);
 	if (param < PARAM_MAX)
 	{
 		param++;
@@ -31,14 +38,12 @@ void action_ButtonPressed1(void) // change parameter to edit (forward)
 //---------------------------------------------------------------------------
 void action_ButtonReleased1(void)
 {
-	STM_EVAL_LEDOff(LED_Blue);
 }
 
 //*****************************************************************************
 //---------------------------------------------------------------------------
 void action_ButtonPressed2(void) // change parameter to edit (backward)
 {
-	STM_EVAL_LEDOn(LED_Blue);
 	if (param > 0)
 	{
 		param--;
@@ -50,7 +55,6 @@ void action_ButtonPressed2(void) // change parameter to edit (backward)
 //---------------------------------------------------------------------------
 void action_ButtonReleased2(void)
 {
-	STM_EVAL_LEDOff(LED_Blue);
 }
 
 
@@ -58,8 +62,6 @@ void action_ButtonReleased2(void)
 //---------------------------------------------------------------------------
 void action_ButtonPressed3(void)
 {
-	STM_EVAL_LEDOn(LED_Blue);
-
 	switch (param)
 	{
 	case 0 : 	pitchGenRequestChangePoints(); 	break ;
@@ -90,14 +92,11 @@ void action_ButtonPressed3(void)
 //---------------------------------------------------------------------------
 void action_ButtonReleased3(void)
 {
-	STM_EVAL_LEDOff(LED_Blue);
 }
 //****************************************************************************
 //---------------------------------------------------------------------------
 void action_ButtonPressed4(void)
 {
-	STM_EVAL_LEDOn(LED_Blue);
-
 	switch (param)
 	{
 	case 0 : 	automatic_or_manual();	break ;
@@ -128,8 +127,36 @@ void action_ButtonPressed4(void)
 //---------------------------------------------------------------------------
 void action_ButtonReleased4(void)
 {
-	STM_EVAL_LEDOff(LED_Blue);
 }
 
 
 //******************************************************************************
+
+// Polling Routine
+void buttons_Update(void) {
+    // Read GPIOs
+    // Assume Active High (Check pull-downs in main.c)
+    uint8_t val1 = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_8);
+    uint8_t val2 = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_9);
+    uint8_t val3 = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_10);
+    uint8_t val4 = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_11);
+
+    // Simple state change detection (Debounce could be added here or in separate file)
+    // For now, simple edge detection
+
+    if (val1 && !btn_state[0]) action_ButtonPressed1();
+    if (!val1 && btn_state[0]) action_ButtonReleased1();
+    btn_state[0] = val1;
+
+    if (val2 && !btn_state[1]) action_ButtonPressed2();
+    if (!val2 && btn_state[1]) action_ButtonReleased2();
+    btn_state[1] = val2;
+
+    if (val3 && !btn_state[2]) action_ButtonPressed3();
+    if (!val3 && btn_state[2]) action_ButtonReleased3();
+    btn_state[2] = val3;
+
+    if (val4 && !btn_state[3]) action_ButtonPressed4();
+    if (!val4 && btn_state[3]) action_ButtonReleased4();
+    btn_state[3] = val4;
+}

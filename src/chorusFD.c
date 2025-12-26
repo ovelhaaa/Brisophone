@@ -45,7 +45,7 @@ float Lfo_SampleCompute(Lfo_t * op) // ! returns a positive value between 0 and 
 	while (op->phase >= _2PI)
 		op->phase -= _2PI;
 
-	z = sinetable[lrintf(ALPHA * (op->phase))];
+	z = sinetable[lrint(ALPHA * (op->phase))];
 	op->out = op->amp * (z + 1);
 
 	return op->out;

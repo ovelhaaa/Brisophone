@@ -8,7 +8,7 @@
  */
 #include "sinetable.h"
 
-const float_t sinetable[1025] =
+const double sinetable[1025] =
 {
 
 		0,  0.00613588,  0.0122715,  0.0184067,  0.0245412,  0.0306748,  0.0368072,  0.0429383

@@ -15,7 +15,7 @@
 /* Private define ------------------------------------------------------------*/
 
 #define SAMPLERATE              48000
-#define Fs             			((float_t)(SAMPLERATE))	// samplerate
+#define Fs             			((double)(SAMPLERATE))	// samplerate
 #define Ts						(1.f/Fs)  // sample period
 #define _2PI                    6.283185307f
 #define _PI                    	3.14159265f
@@ -46,11 +46,11 @@
 
 typedef struct
 {
-	float_t 	amp;
-	float_t 	freq;
-	float_t 	phase;
-	float_t		phi0;
-	float_t 	out;
+	double 	amp;
+	double 	freq;
+	double 	phase;
+	double		phi0;
+	double 	out;
 } Lfo_t;
 
 /* Private variables ---------------------------------------------------------*/
@@ -87,7 +87,7 @@ float RandomLfoSampleCompute(Lfo_t * op) //
 	while (op->phase >= _2PI)
 		op->phase -= _2PI;
 
-	z = sinetable[lrintf(ALPHA * (op->phase))];
+	z = sinetable[lrint(ALPHA * (op->phase))];
 	op->out = op->amp*z;
 
 	return op->out;
@@ -114,7 +114,7 @@ float chorus_leftCompute(float x)
 	if (inLindex >= DepthL) inLindex = 0; else inLindex++;
 	if (outLindex >= DepthL) outLindex = 0; else outLindex++;
 
-	excursion_valueL = (int32_t)lrintf(sweep_widthL * RandomLfoSampleCompute(&lfoL));
+	excursion_valueL = (int32_t)lrint(sweep_widthL * RandomLfoSampleCompute(&lfoL));
 	outVarLindex += 1 + excursion_valueL;
 	if (outVarLindex > DepthL) outVarLindex -= DepthL;
 	if (outVarLindex < 0) outVarLindex += DepthL + 1 ;
@@ -138,7 +138,7 @@ float chorus_rightCompute(float x)
 	if (inRindex >= DepthR) inRindex = 0; else inRindex++;
 	if (outRindex >= DepthR) outRindex = 0; else outRindex++;
 
-	excursion_valueR = (int32_t)lrintf(sweep_widthR * RandomLfoSampleCompute(&lfoR));
+	excursion_valueR = (int32_t)lrint(sweep_widthR * RandomLfoSampleCompute(&lfoR));
 	outVarRindex += 1 + excursion_valueR;
 	if (outVarRindex > DepthR) outVarRindex -= DepthR;
 	if (outVarRindex < 0) outVarRindex += DepthR + 1 ;
