@@ -21,7 +21,7 @@
 
 
 
-extern const float_t notesFreq[];
+extern const double notesFreq[];
 extern const uint8_t MIDIscale01[];
 extern const uint8_t MIDIscale02[];
 extern const uint8_t MIDIscale03[];

@@ -18,7 +18,7 @@
 #define _2PI    6.283185307f
 #define ALPHA	(SINETABLE_SIZE/_2PI)
 
-extern const  float_t sinetable[1025];
+extern const  double sinetable[1025];
 
 #endif // __sinetable_h_
 

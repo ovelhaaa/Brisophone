@@ -1,32 +1,32 @@
 /**
  ******************************************************************************
- * File Name		: timers.h
- * Author			: Xavier Halgand
- * Date				:
- * Description		:
+ * File Name          : audio.h
+ * Author				: Xavier Halgand
+ * Date               :
+ * Description        :
  ******************************************************************************
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __TIMERS_H
-#define __TIMERS_H
+#ifndef __AUDIO_H
+#define __AUDIO_H
 
 
 /* Includes ------------------------------------------------------------------*/
-//#include "stm32f4xx_gpio.h"
-//#include "mx_gpio.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include "CONSTANTS.h"
-#include "audio.h"
-#include "stm32f4_discovery_audio_codec.h"
-#include "stm32f4_discovery.h"
+#include "stm32h7xx_hal.h"
 #include "soundGen.h"
-#include "bargraph.h"
 
 /* Exported functions ------------------------------------------------------- */
-void TimingDelay_Decrement(void);
-void wait(uint32_t nTime);
-void setSysTick(void);
+void audio_init(void);
+void toggleSound(void);
+void incVol(void);
+void decVol(void);
 
-#endif /* __TIMERS_H */
+// DMA Callbacks
+void HAL_I2S_TxHalfCpltCallback(I2S_HandleTypeDef *hi2s);
+void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s);
+
+#endif /* __AUDIO_H */

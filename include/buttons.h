@@ -13,16 +13,13 @@
 
 
 /* Includes ------------------------------------------------------------------*/
-//#include "stm32f4xx_gpio.h"
-//#include "mx_gpio.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include "CONSTANTS.h"
 #include "audio.h"
-#include "stm32f4_discovery_audio_codec.h"
-#include "stm32f4_discovery.h"
 #include "soundGen.h"
 #include "bargraph.h"
+#include "stm32h7xx_hal.h"
 
 /* Exported functions ------------------------------------------------------- */
 void action_ButtonPressed1(void);
@@ -34,5 +31,7 @@ void action_ButtonReleased3(void);
 void action_ButtonPressed4(void);
 void action_ButtonReleased4(void);
 
+// Polling function to be called from main loop
+void buttons_Update(void);
 
 #endif /* __BUTTONS_H */

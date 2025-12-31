@@ -22,8 +22,8 @@ extern uint16_t audiobuff[];
 static Oscillator 			op1 , op2 , op3, lfo  ;
 static EightSegGenerator 	pitchGen ;
 
-static float_t	a[PARTIALS_NUMBER + 1] ;
-static float_t	ph[PARTIALS_NUMBER + 1] ;
+static double	a[PARTIALS_NUMBER + 1] ;
+static double	ph[PARTIALS_NUMBER + 1] ;
 
 static bool 	filterON = false;
 static bool		delayON = true;
@@ -37,7 +37,7 @@ static uint8_t	octaveSpread = 4;
 static uint8_t	rootNote = 36;
 static int8_t	transpose;
 
-const float_t slicePhase[9] = {0, DELTAPHI, 2*DELTAPHI, 3*DELTAPHI, 4*DELTAPHI, 5*DELTAPHI, 6*DELTAPHI, 7*DELTAPHI, 8*DELTAPHI};
+const double slicePhase[9] = {0, DELTAPHI, 2*DELTAPHI, 3*DELTAPHI, 4*DELTAPHI, 5*DELTAPHI, 6*DELTAPHI, 7*DELTAPHI, 8*DELTAPHI};
 
 /*===============================================================================================================*/
 
@@ -233,7 +233,7 @@ void decDecay(void)
 	if (decayFactor > EPSI) decayFactor -= EPSI;
 }
 /*-------------------------------------------------------*/
-void pitchGen_setMaxFreq( float_t fr)
+void pitchGen_setMaxFreq( double fr)
 {
 	pitchGen.max = fr;
 }
@@ -268,7 +268,7 @@ void prevSound(void)
 }
 /*-------------------------------------------------------*/
 /*-------------------------------------------------------*/
-void genInit(EightSegGenerator * gen, float_t amp, float_t freq)
+void genInit(EightSegGenerator * gen, double amp, double freq)
 {
 	gen->amp = amp;
 	gen->freq = freq;
@@ -297,9 +297,9 @@ void pitchGen_NewPoints(EightSegGenerator * gen)
 
 	for (i = 0; i <= 7; i++)
 	{
-		//gen->s[i] = notesfreq[lrintf(frand_a_b(0 , gen->max))];
-		relativeNote = currentScale[lrintf(frand_a_b(1 , currentScale[0]))];
-		octaveShift = 12 * lrintf(frand_a_b(0 , octaveSpread));
+		//gen->s[i] = notesfreq[lrint(frand_a_b(0 , gen->max))];
+		relativeNote = currentScale[lrint(frand_a_b(1 , currentScale[0]))];
+		octaveShift = 12 * lrint(frand_a_b(0 , octaveSpread));
 		index = rootNote + octaveShift + relativeNote - FIRST_NOTE;
 
 		while (index > MAX_NOTE_INDEX) index -= 12;
@@ -326,7 +326,7 @@ void soundGen_NewPoints(EightSegGenerator * gen)
 /*-------------------------------------------------------*/
 void gen_DCblock(EightSegGenerator * gen)
 {
-	float_t moy = 0;
+	double moy = 0;
 	uint8_t i;
 
 	for (i = 0; i <= 7; i++)
@@ -340,12 +340,12 @@ void gen_DCblock(EightSegGenerator * gen)
 /*-------------------------------------------------------*/
 void gen_NormalizePoints(EightSegGenerator * gen)
 {
-	float_t max = 0, invmax, val;
+	double max = 0, invmax, val;
 	uint8_t i;
 
 	for (i = 0; i <= 7; i++)
 	{
-		val = fabsf(gen->s[i]);
+		val = fabs(gen->s[i]);
 		if (val > max) max = val;
 	}
 	if (max != 0)
@@ -407,7 +407,7 @@ void pitchGenResetPhase(void)
 	pitchGen.phase = 0;
 }
 /*-------------------------------------------------------*/
-float_t gen_SampleCompute(EightSegGenerator * gen)
+double gen_SampleCompute(EightSegGenerator * gen)
 {
 	uint8_t i;
 
@@ -434,16 +434,16 @@ float_t gen_SampleCompute(EightSegGenerator * gen)
 
 /*===============================================================================================================*/
 
-float_t OpSampleCompute0(Oscillator * op) // accurate sine
+double OpSampleCompute0(Oscillator * op) // accurate sine
 {
-	float_t z;
+	double z;
 
 	while (op->phase < 0) // keep phase in [0, 2pi]
 		op->phase += _2PI;
 	while (op->phase >= _2PI)
 		op->phase -= _2PI;
 
-	z = sinf(op->phase);
+	z = sin(op->phase);
 	op->out = op->amp*z;
 
 	op->phase += _2PI * Ts * op->freq; // increment phase
@@ -451,7 +451,7 @@ float_t OpSampleCompute0(Oscillator * op) // accurate sine
 }
 
 /*-------------------------------------------------------*/
-float_t OpSampleCompute1(Oscillator * op) // basic sawtooth^2
+double OpSampleCompute1(Oscillator * op) // basic sawtooth^2
 {
 	while (op->phase < 0) // keep phase in [0, 2pi]
 		op->phase += _2PI;
@@ -465,7 +465,7 @@ float_t OpSampleCompute1(Oscillator * op) // basic sawtooth^2
 	return op->out;
 }
 /*-------------------------------------------------------*/
-float_t OpSampleCompute2(Oscillator * op) // basic sawtooth
+double OpSampleCompute2(Oscillator * op) // basic sawtooth
 {
 	while (op->phase < 0) // keep phase in [0, 2pi]
 		op->phase += _2PI;
@@ -479,25 +479,25 @@ float_t OpSampleCompute2(Oscillator * op) // basic sawtooth
 	return op->out;
 }
 /*-------------------------------------------------------*/
-float_t OpSampleCompute3(Oscillator * op) // sin(phi)^5
+double OpSampleCompute3(Oscillator * op) // sin(phi)^5
 {
-	float_t z;
+	double z;
 
 	while (op->phase < 0) // keep phase in [0, 2pi]
 		op->phase += _2PI;
 	while (op->phase >= _2PI)
 		op->phase -= _2PI;
 
-	z = sinf(op->phase);
+	z = sin(op->phase);
 	op->out = op->amp*z*z*z*z*z;
 
 	op->phase += _2PI * Ts * op->freq; // increment phase
 	return op->out;
 }
 /*-------------------------------------------------------*/
-float_t OpSampleCompute4(Oscillator * op) // Complex waveform : +/- |sin(phi)|^alpha(freq), tends to a sine at high freqs
+double OpSampleCompute4(Oscillator * op) // Complex waveform : +/- |sin(phi)|^alpha(freq), tends to a sine at high freqs
 {
-	float_t z, x, alpha;
+	double z, x, alpha;
 
 	while (op->phase < 0) // keep phase in [0, 2pi]
 		op->phase += _2PI;
@@ -510,7 +510,7 @@ float_t OpSampleCompute4(Oscillator * op) // Complex waveform : +/- |sin(phi)|^a
 	alpha = 81.096f -.037f * x + .582E-5f * x*x -.311E-9f * x*x*x ; //alpha varies from 80 to 1 with freq from 30Hz to 8000Hz
 	//alpha = 60.695f -.023f * x + .31E-5f * x*x -.141E-9f * x*x*x ;
 	//alpha = (50.f-1)/(30.f-8000)*(x - 8000) + 1 ;
-	z = powf(fabsf(sinf(op->phase )), alpha) ;
+	z = pow(fabs(sin(op->phase )), alpha) ;
 
 	if (op->phase < _PI) op->out = op->amp * z;
 	else op->out = - op->amp * z;
@@ -519,7 +519,7 @@ float_t OpSampleCompute4(Oscillator * op) // Complex waveform : +/- |sin(phi)|^a
 	return op->out;
 }
 /*-------------------------------------------------------*/
-float_t OpSampleCompute5(Oscillator * op) // Basic Triangle
+double OpSampleCompute5(Oscillator * op) // Basic Triangle
 {
 	while (op->phase < 0) // keep phase in [0, 2pi]
 		op->phase += _2PI;
@@ -533,7 +533,7 @@ float_t OpSampleCompute5(Oscillator * op) // Basic Triangle
 	return op->out;
 }
 /*-------------------------------------------------------*/
-float_t OpSampleCompute6(Oscillator * op) // Morphing sawtooth, tends to a triangle at high freqs
+double OpSampleCompute6(Oscillator * op) // Morphing sawtooth, tends to a triangle at high freqs
 {
 	while (op->phase < 0) // keep phase in [0, 2pi]
 		op->phase += _2PI;
@@ -550,26 +550,26 @@ float_t OpSampleCompute6(Oscillator * op) // Morphing sawtooth, tends to a trian
 }
 
 /*-------------------------------------------------------*/
-float_t OpSampleCompute7(Oscillator * op) // basic wave table sine
+double OpSampleCompute7(Oscillator * op) // basic wave table sine
 {
-	float_t z;
+	double z;
 
 	while (op->phase < 0) // keep phase in [0, 2pi]
 		op->phase += _2PI;
 	while (op->phase >= _2PI)
 		op->phase -= _2PI;
 
-	z = sinetable[lrintf(ALPHA * (op->phase))];
+	z = sinetable[lrint(ALPHA * (op->phase))];
 	op->out = op->amp*z;
 
 	op->phase += _2PI * Ts * op->freq; // increment phase
 	return op->out;
 }
 /*-------------------------------------------------------*/
-float_t AdditiveGen_SampleCompute(Oscillator * op) // additive sine generator
+double AdditiveGen_SampleCompute(Oscillator * op) // additive sine generator
 {
 	uint8_t k=1;
-	float_t y = 0;
+	double y = 0;
 
 	while ((k <= PARTIALS_NUMBER ) && (k * op->freq < SAMPLERATE/2.f))
 	{
@@ -577,7 +577,7 @@ float_t AdditiveGen_SampleCompute(Oscillator * op) // additive sine generator
 			ph[k] += _2PI;
 		while (ph[k] >= _2PI)
 			ph[k] -= _2PI;
-		y += a[k] * sinetable[lrintf(ALPHA * (ph[k]))];
+		y += a[k] * sinetable[lrint(ALPHA * (ph[k]))];
 		ph[k] += _2PI * Ts * k * op->freq; // increment phase
 		k++;
 	}
@@ -589,7 +589,7 @@ float_t AdditiveGen_SampleCompute(Oscillator * op) // additive sine generator
 }
 /*-------------------------------------------------------*/
 void
-OpInit(Oscillator * op, float_t amp, float_t freq)
+OpInit(Oscillator * op, double amp, double freq)
 {
 	op->sound = 0;
 	op->amp = amp;
@@ -601,14 +601,14 @@ OpInit(Oscillator * op, float_t amp, float_t freq)
 /*-------------------------------------------------------*/
 
 void
-OpSetFreq(Oscillator * op, float_t f)
+OpSetFreq(Oscillator * op, double f)
 {
 	op->freq = f;
 }
 /*-------------------------------------------------------*/
 
 void
-OpSetPhaseAdd(Oscillator * op, float_t phi)
+OpSetPhaseAdd(Oscillator * op, double phi)
 {
 	op->phase += phi;
 }
@@ -635,8 +635,8 @@ void make_sound(uint16_t offset, uint16_t len)
 {
 	uint16_t pos;
 	uint16_t *outp;
-	float_t y = 0, f0;
-	float_t yL, yR ;
+	double y = 0, f0;
+	double yL, yR ;
 	uint16_t valueL, valueR;
 
 	outp = audiobuff + offset;
@@ -655,10 +655,10 @@ void make_sound(uint16_t offset, uint16_t len)
 			if (transpose != 0) { rootNote += transpose ; pitchGenChangePoints(); transpose = 0; }
 
 			LPfilter_computeCoeff( frand_a_b(300 , 5000), .81f);
-			if (pitchGen.someNotesMuted) env = roundf(frand_a_b(0.4f , 1)); // env = 1 or sometimes 0
+			if (pitchGen.someNotesMuted) env = round(frand_a_b(0.4f , 1)); // env = 1 or sometimes 0
 			else env = 1; // reset envelope
 
-			if (pitchGen.glide) pitchGen.step = rintf(frand_a_b(0 , 1)); else pitchGen.step = 0;
+			if (pitchGen.glide) pitchGen.step = rint(frand_a_b(0 , 1)); else pitchGen.step = 0;
 
 			if (pitchGen.stage == 0 && (pitchGen.autom || pitchGen.chRequest))
 			{

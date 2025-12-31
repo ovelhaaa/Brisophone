@@ -32,20 +32,20 @@
 typedef struct
 {
 	uint8_t		sound; // waveform function number
-	float_t 	amp;
-	float_t		last_amp;
-	float_t 	freq;
-	float_t 	phase;
-	float_t		phi0;
-	float_t		decayFactor;
-	float_t 	out;
+	double 	amp;
+	double		last_amp;
+	double 	freq;
+	double 	phase;
+	double		phi0;
+	double		decayFactor;
+	double 	out;
 
 } Oscillator;
 
 typedef struct
 {
-	float_t 	s[9];		// summit values, s[8] = s[0]
-	float_t 	coeff[8];	// intermediate coefficients to accelerate computing
+	double 	s[9];		// summit values, s[8] = s[0]
+	double 	coeff[8];	// intermediate coefficients to accelerate computing
 	bool 		autom;		// random notes ?
 	bool		glide;		// glissando between notes ?
 	bool		chRequest;
@@ -53,11 +53,11 @@ typedef struct
 	uint8_t		step;
 	uint8_t 	stage; // from 0 to 7
 	uint8_t 	oldstage;
-	float_t 	max;
-	float_t 	amp;
-	float_t 	freq;
-	float_t 	phase;
-	float_t 	out;
+	double 	max;
+	double 	amp;
+	double 	freq;
+	double 	phase;
+	double 	out;
 
 } EightSegGenerator;
 
@@ -81,7 +81,7 @@ void prevSound(void);
 void pitchGenInit(void);
 void pitchGenChangePoints(void);
 void pitchGenRequestChangePoints(void);
-void pitchGen_setMaxFreq( float_t fr);
+void pitchGen_setMaxFreq( double fr);
 void automatic_or_manual(void);
 void toggleGlide(void);
 void muteSomeNotes(void);
@@ -91,7 +91,7 @@ void incTempo(void);
 void decTempo(void);
 void incMaxFreq(void);
 void decMaxFreq(void);
-void pitchGenSetFreq (float_t f);
+void pitchGenSetFreq (double f);
 void pitchGenResetPhase(void);
 void soundGenInit(void);
 void soundGenNewWave(void);
